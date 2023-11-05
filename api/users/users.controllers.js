@@ -32,14 +32,17 @@ exports.signup = async (req, res, next) => {
   }
 };
 
-exports.signin = async (req, res) => {
+exports.signin = async (req, res, next) => {
   try {
+    const token = await generateToken(req.user);
+    res.status(201).json({ token });
   } catch (err) {
-    res.status(500).json("Server Error");
+    next(err);
+    // res.status(500).json("Server Error");
   }
 };
 
-exports.getUsers = async (req, res) => {
+exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find().populate("urls");
     res.status(201).json(users);
