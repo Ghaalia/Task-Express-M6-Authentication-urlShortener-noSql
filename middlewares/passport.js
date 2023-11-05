@@ -8,11 +8,12 @@ const localStrategy = new LocalStrategy(
   async (username, password, done) => {
     try {
       const user = await User.findOne({ username: username });
-      if (!user) done({ message: "Username Or Password is wrong !!" });
-      const passwordsMatch = bcrypt.compare(password, user.password);
+      if (!user) return done({ message: "Username Or Password is wrong !!" });
+      const passwordsMatch = await bcrypt.compare(password, user.password);
       if (!passwordsMatch)
-        done({ message: "Username Or Password is wrong !!" });
-      done(null, user);
+        return done({ message: "Username Or Password is wrong !!" });
+
+      return done(null, user);
     } catch (error) {
       done(error);
     }
