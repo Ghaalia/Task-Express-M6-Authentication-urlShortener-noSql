@@ -1,7 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+require("dotenv").config();
 
 const LocalStrategy = require("passport-local").Strategy;
+const JWTStrategy = require("passport-jwt").Strategy;
+const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
 
 const localStrategy = new LocalStrategy(
   { usernameField: "username" },
@@ -20,4 +23,22 @@ const localStrategy = new LocalStrategy(
   }
 );
 
-module.exports = localStrategy;
+const jwtStrategy = new JWTStrategy(
+  {
+    jsonWebTokenOptions: fromAuthHeaderAsBearerToken,
+    secretOrKey: process.env.JWT_PRIVATE,
+  },
+  async (payload, done) => {
+    try {
+      if (Date.now() / 1000 > payload.exp) return done(null, false);
+      const user = User.findById(payload._id);
+      if (!user) return done(null, false);
+
+      return done(null, user);
+    } catch (error) {
+      done(error);
+    }
+  }
+);
+
+module.exports = { localStrategy, jwtStrategy };
