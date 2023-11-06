@@ -1,13 +1,13 @@
-const mongoose = require("mongoose");
+const { model, Schema } = require("mongoose");
 
-const URLSchema = new mongoose.Schema({
+const URLSchema = new Schema({
   urlCode: String,
   longUrl: String,
   shortUrl: String,
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
   },
 });
 
-module.exports = mongoose.model("Url", URLSchema);
+module.exports = model("Url", URLSchema);
