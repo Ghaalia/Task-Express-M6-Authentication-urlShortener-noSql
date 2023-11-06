@@ -34,7 +34,7 @@ const jwtStrategy = new JwtStrategy(
       console.log(payload);
 
       if (Date.now() / 1000 > payload.exp) return done(null, false);
-      const user = User.findById(payload._id);
+      const user = await User.findById(payload._id);
       if (!user) return done(null, false);
 
       return done(null, user);

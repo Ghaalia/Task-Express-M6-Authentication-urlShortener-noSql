@@ -11,6 +11,7 @@ exports.shorten = async (req, res, next) => {
     req.body.shortUrl = `${baseUrl}/${urlCode}`;
     req.body.urlCode = urlCode;
     req.body.userId = req.user._id;
+    console.log(req.body);
     const newUrl = await Url.create(req.body);
     await User.findByIdAndUpdate(req.body.userId, {
       $push: { urls: newUrl._id },
@@ -37,11 +38,13 @@ exports.redirect = async (req, res, next) => {
 exports.deleteUrl = async (req, res, next) => {
   try {
     const url = await Url.findOne({ urlCode: req.params.code });
-    if (url) {
+    if (!url) return next({ message: "url not found" });
+    console.log(url);
+    if (url.userId.equals(req.user._id)) {
       await Url.findByIdAndDelete(url._id);
       return res.status(201).json("Deleted");
     } else {
-      return res.status(404).json("No URL Found");
+      return res.status(404).json("You don't have permission");
     }
   } catch (err) {
     next(err);
