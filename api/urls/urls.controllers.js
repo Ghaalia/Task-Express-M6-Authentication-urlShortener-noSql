@@ -10,7 +10,7 @@ exports.shorten = async (req, res, next) => {
   try {
     req.body.shortUrl = `${baseUrl}/${urlCode}`;
     req.body.urlCode = urlCode;
-    req.body.userId = req.body;
+    req.body.userId = req.user._id;
     const newUrl = await Url.create(req.body);
     await User.findByIdAndUpdate(req.body.userId, {
       $push: { urls: newUrl._id },

@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const LocalStrategy = require("passport-local").Strategy;
-const JWTStrategy = require("passport-jwt").Strategy;
+const JwtStrategy = require("passport-jwt").Strategy;
 const { fromAuthHeaderAsBearerToken } = require("passport-jwt").ExtractJwt;
 
 const localStrategy = new LocalStrategy(
@@ -23,13 +23,16 @@ const localStrategy = new LocalStrategy(
   }
 );
 
-const jwtStrategy = new JWTStrategy(
+const jwtStrategy = new JwtStrategy(
   {
-    jwtFromRequest: fromAuthHeaderAsBearerToken,
+    jwtFromRequest: fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_PRIVATE,
   },
   async (payload, done) => {
+    console.log("object");
     try {
+      console.log(payload);
+
       if (Date.now() / 1000 > payload.exp) return done(null, false);
       const user = User.findById(payload._id);
       if (!user) return done(null, false);
